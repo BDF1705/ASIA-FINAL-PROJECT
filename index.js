@@ -119,7 +119,34 @@ app.put("/posts/:id", (req, res) => {
       .catch((error) => {
         console.error("ERROR:", error);
         res.status(500).json({ message: "An error occured while creating the post"});
+      });
+});
+
+app.delete("/posts/:id", (req, res) => {
+    const pgp = pgPromise();
+    const db = pgp("postgres://postgres:admin@localhost:5432/blog");
+    
+    const postId = req.params.id;
+
+    db.none("DELETE FROM post WHERE id = ${id}", {
+        id: postId,
+    })
+      .then(() => {
+        res.status(201).json({ message: "Successful!" });
+
+        return db.one("SELECT COUNT(*) AS count from post")
+        .then((data) => {
+          const resetIdTo = parseInt(data.count) + 1;
+          
+          return db.none("ALTER SEQUENCE post_id_seq RESTART WITH ${resetId}", {
+            resetId: resetIdTo
+          });
+        });
       })
+      .catch((error) => {
+        console.error("ERROR:", error);
+        res.status(500).json({ message: "An error occured while creating the post"});
+      });
 });
 
 app.listen(3000);
