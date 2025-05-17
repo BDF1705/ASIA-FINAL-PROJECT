@@ -22,9 +22,66 @@ app.get("/posts", (req, res) => {
       })
       .catch((error) => {
         console.log('ERROR:', error);
+        res.status(500).json({ message: 'An error occurred' });
       });
 
 });
 
+app.get("/posts/:id", (req, res) => {
+    const pgp = pgPromise();
+    const db = pgp("postgres://postgres:admin@localhost:5432/blog");
+    
+    const postId = req.params.id;
+
+    db.one("SELECT * FROM post WHERE id = $1", [postId])
+      .then((data) => {
+        res.json(data);
+      })
+      .catch((error, data) => {
+        if (data == undefined) {
+            res.json({ message: 'No data available' });
+        }
+        else {
+            console.log('ERROR:', error);
+            res.status(500).json({ message: 'An error occurred' });
+        }
+      });
+
+});
+
+app.post("/posts", (req, res) => {
+    const pgp = pgPromise();
+    const db = pgp("postgres://postgres:admin@localhost:5432/blog");
+    
+    const body = req.body;
+    const title = body.title;
+    
+    const date = body.date;
+    const tags = body.tags;
+    const text = body.text;
+    const author = body.author;
+
+    const contentObj = {
+        title: title,
+        date: date,
+        tags: tags,
+        text: text,
+        author: author
+    };
+
+    const content = JSON.stringify(contentObj);
+
+    db.none("INSERT INTO post(title, content) VALUES(${title}, ${content})", {
+        title: title,
+        content: content
+    })
+      .then(() => {
+        res.status(201).json({ message: "Successful!" });
+      })
+      .catch((error) => {
+        console.error("ERROR:", error);
+        res.status(500).json({ message: "An error occured while creating the post"});
+      })
+});
 
 app.listen(3000);
