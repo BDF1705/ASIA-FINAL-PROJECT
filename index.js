@@ -84,4 +84,42 @@ app.post("/posts", (req, res) => {
       })
 });
 
+app.put("/posts/:id", (req, res) => {
+    const pgp = pgPromise();
+    const db = pgp("postgres://postgres:admin@localhost:5432/blog");
+    
+    const postId = req.params.id;
+    
+    const body = req.body;
+    const title = body.title;
+    
+    const date = body.date;
+    const tags = body.tags;
+    const text = body.text;
+    const author = body.author;
+
+    const contentObj = {
+        title: title,
+        date: date,
+        tags: tags,
+        text: text,
+        author: author
+    };
+
+    const content = JSON.stringify(contentObj);
+
+    db.none("UPDATE post SET title = ${title}, content = ${content} WHERE id = ${id}", {
+        id: postId,
+        title: title,
+        content: content
+    })
+      .then(() => {
+        res.status(201).json({ message: "Successful!" });
+      })
+      .catch((error) => {
+        console.error("ERROR:", error);
+        res.status(500).json({ message: "An error occured while creating the post"});
+      })
+});
+
 app.listen(3000);
