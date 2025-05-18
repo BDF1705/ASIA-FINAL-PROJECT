@@ -67,7 +67,6 @@ app.post("/posts", authenticateJWT, (req, res) => {
     const author = body.author;
 
     const contentObj = {
-        title: title,
         date: date,
         tags: tags,
         text: text,
@@ -101,7 +100,6 @@ app.put("/posts/:id", authenticateJWT, (req, res) => {
     const author = body.author;
 
     const contentObj = {
-        title: title,
         date: date,
         tags: tags,
         text: text,
