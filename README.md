@@ -50,7 +50,7 @@ This is a simple RESTful API built with Node.js and Express.js. It allows you to
 
     The API will be accessible at `http://localhost:3000`.
 
-## Endpoints
+## Sample Endpoints
 
 ### 1. **GET /posts**
 Retrieve all blog posts.
