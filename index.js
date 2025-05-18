@@ -1,21 +1,32 @@
 import express from "express";
 import bodyParser from "body-parser";
 import pgPromise from "pg-promise";
+import dotenv from "dotenv";
+
+import { rateLimiter } from "./middlewares/rateLimiter.js";
+import { authenticateJWT } from "./middlewares/auth.js";
+
+dotenv.config();
+
+const dbHost = process.env.DB_HOST;
+const dbPort = process.env.DB_PORT;
+const dbUser = process.env.DB_USER;
+const dbPasswd = process.env.DB_PASSWORD;
+const dbName = process.env.DB_NAME;
 
 const app = express();
 app.use(bodyParser.json());
+app.use(rateLimiter);
 app.use(express.urlencoded({ extended : true }));
 
-let posts = [];
+const pgp = pgPromise();
+const db = pgp(`postgres://${dbUser}:${dbPasswd}@${dbHost}:${dbPort}/${dbName}`);
 
-app.get('/', (req, res) => {
-    res.send("BANKAAIII!");
+app.get('/', authenticateJWT, (req, res) => {
+    res.send("Blog Posts API");
 });
 
-app.get("/posts", (req, res) => {
-    const pgp = pgPromise();
-    const db = pgp("postgres://postgres:admin@localhost:5432/blog");
-    
+app.get("/posts", authenticateJWT, (req, res) => {
     db.any("SELECT * FROM post")
       .then((data) => {
         res.json(data);
@@ -27,10 +38,7 @@ app.get("/posts", (req, res) => {
 
 });
 
-app.get("/posts/:id", (req, res) => {
-    const pgp = pgPromise();
-    const db = pgp("postgres://postgres:admin@localhost:5432/blog");
-    
+app.get("/posts/:id", authenticateJWT, (req, res) => {
     const postId = req.params.id;
 
     db.one("SELECT * FROM post WHERE id = $1", [postId])
@@ -49,10 +57,7 @@ app.get("/posts/:id", (req, res) => {
 
 });
 
-app.post("/posts", (req, res) => {
-    const pgp = pgPromise();
-    const db = pgp("postgres://postgres:admin@localhost:5432/blog");
-    
+app.post("/posts", authenticateJWT, (req, res) => {
     const body = req.body;
     const title = body.title;
     
@@ -84,10 +89,7 @@ app.post("/posts", (req, res) => {
       })
 });
 
-app.put("/posts/:id", (req, res) => {
-    const pgp = pgPromise();
-    const db = pgp("postgres://postgres:admin@localhost:5432/blog");
-    
+app.put("/posts/:id", authenticateJWT, (req, res) => {
     const postId = req.params.id;
     
     const body = req.body;
@@ -122,10 +124,7 @@ app.put("/posts/:id", (req, res) => {
       });
 });
 
-app.delete("/posts/:id", (req, res) => {
-    const pgp = pgPromise();
-    const db = pgp("postgres://postgres:admin@localhost:5432/blog");
-    
+app.delete("/posts/:id", authenticateJWT, (req, res) => {
     const postId = req.params.id;
 
     db.none("DELETE FROM post WHERE id = ${id}", {

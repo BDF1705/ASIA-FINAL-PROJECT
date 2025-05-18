@@ -1,6 +1,9 @@
 {
   "dependencies": {
+    "dotenv": "^16.5.0",
     "express": "^5.1.0",
+    "express-rate-limit": "^7.5.0",
+    "jsonwebtoken": "^9.0.2",
     "pg-promise": "^11.13.0"
   },
   "name": "sanvictores_asia_final_project",
