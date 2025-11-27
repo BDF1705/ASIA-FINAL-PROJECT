@@ -22,7 +22,7 @@ app.use(express.urlencoded({ extended : true }));
 const pgp = pgPromise();
 const db = pgp(`postgres://${dbUser}:${dbPasswd}@${dbHost}:${dbPort}/${dbName}`);
 
-app.get('/', authenticateJWT, (req, res) => {
+app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
