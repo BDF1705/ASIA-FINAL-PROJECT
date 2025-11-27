@@ -19,14 +19,13 @@ app.use(bodyParser.json());
 app.use(rateLimiter);
 app.use(express.urlencoded({ extended : true }));
 
-const pgp = pgPromise();
-const db = pgp(`postgres://${dbUser}:${dbPasswd}@${dbHost}:${dbPort}/${dbName}`);
-
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
+    res.sendFile('index.html');
 });
 
 app.get("/posts", authenticateJWT, (req, res) => {
+  const pgp = pgPromise();
+  const db = pgp(`postgres://${dbUser}:${dbPasswd}@${dbHost}:${dbPort}/${dbName}`);
     db.any("SELECT * FROM post")
       .then((data) => {
         res.json(data);
@@ -39,6 +38,8 @@ app.get("/posts", authenticateJWT, (req, res) => {
 });
 
 app.get("/posts/:id", authenticateJWT, (req, res) => {
+    const pgp = pgPromise();
+    const db = pgp(`postgres://${dbUser}:${dbPasswd}@${dbHost}:${dbPort}/${dbName}`);
     const postId = req.params.id;
 
     db.one("SELECT * FROM post WHERE id = $1", [postId])
@@ -58,6 +59,8 @@ app.get("/posts/:id", authenticateJWT, (req, res) => {
 });
 
 app.post("/posts", authenticateJWT, (req, res) => {
+    const pgp = pgPromise();
+    const db = pgp(`postgres://${dbUser}:${dbPasswd}@${dbHost}:${dbPort}/${dbName}`);
     const body = req.body;
     const title = body.title;
     
@@ -89,6 +92,8 @@ app.post("/posts", authenticateJWT, (req, res) => {
 });
 
 app.put("/posts/:id", authenticateJWT, (req, res) => {
+    const pgp = pgPromise();
+    const db = pgp(`postgres://${dbUser}:${dbPasswd}@${dbHost}:${dbPort}/${dbName}`);
     const postId = req.params.id;
     
     const body = req.body;
@@ -123,6 +128,8 @@ app.put("/posts/:id", authenticateJWT, (req, res) => {
 });
 
 app.delete("/posts/:id", authenticateJWT, (req, res) => {
+    const pgp = pgPromise();
+    const db = pgp(`postgres://${dbUser}:${dbPasswd}@${dbHost}:${dbPort}/${dbName}`);
     const postId = req.params.id;
 
     db.none("DELETE FROM post WHERE id = ${id}", {
