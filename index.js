@@ -23,7 +23,7 @@ const pgp = pgPromise();
 const db = pgp(`postgres://${dbUser}:${dbPasswd}@${dbHost}:${dbPort}/${dbName}`);
 
 app.get('/', authenticateJWT, (req, res) => {
-    res.send("Blog Posts API");
+    res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 app.get("/posts", authenticateJWT, (req, res) => {
