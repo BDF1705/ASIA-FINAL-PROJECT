@@ -20,7 +20,7 @@ app.use(rateLimiter);
 app.use(express.urlencoded({ extended : true }));
 
 app.get('/', (req, res) => {
-    res.sendFile('/workspaces/ASIA-FINAL-PROJECT/index.html');
+    res.sendFile('/opt/render/project/src/index.html');
 });
 
 app.get("/posts", authenticateJWT, (req, res) => {
